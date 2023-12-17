@@ -1,5 +1,6 @@
 package com.coursework.springbooteshop.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +27,7 @@ public class Product implements Serializable {
     String manufacturer;
 
     @ManyToOne
+    @JsonIgnore
     Warehouse warehouse;
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @LazyCollection(LazyCollectionOption.FALSE)
