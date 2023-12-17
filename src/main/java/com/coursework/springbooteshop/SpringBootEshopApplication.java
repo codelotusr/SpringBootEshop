@@ -1,6 +1,7 @@
 package com.coursework.springbooteshop;
 
 import com.coursework.springbooteshop.model.Customer;
+import com.coursework.springbooteshop.model.Manager;
 import com.coursework.springbooteshop.model.User;
 import com.coursework.springbooteshop.repos.UserRepository;
 import org.slf4j.Logger;
@@ -25,8 +26,10 @@ public class SpringBootEshopApplication {
     @Bean
     public CommandLineRunner demo(UserRepository repository) {
         return (args) -> {
-            repository.save(new Customer("a", "a", LocalDate.of(2002, 9, 15), "Testinis", "Customer", "Test g. 15", "5555555555555555"));
-            repository.save(new Customer("a1", "a1", LocalDate.of(2003, 9, 12), "Testinis1", "Customer1", "Test g. 5", "4555555555555555"));
+            saveUserIfNotExists(repository, new Customer("a", "a", LocalDate.of(2002, 9, 15), "Testinis", "Customer", "Test g. 15", "5555555555555555"));
+            saveUserIfNotExists(repository, new Customer("a1", "a1", LocalDate.of(2003, 9, 12), "Testinis1", "Customer1", "Test g. 5", "4555555555555555"));
+            saveUserIfNotExists(repository, new Manager("mg", "mg", LocalDate.of(2000, 10, 11), "Testinis2", "Manager", "EMP12345", "Certified", LocalDate.of(2020, 10, 11), true));
+            saveUserIfNotExists(repository, new Manager("mg1", "mg1", LocalDate.of(2001, 10, 11), "Testinis3", "Manager1", "EMP12346", "Certified", LocalDate.of(2020, 5, 11), false));
 
 
             logger.info("All users found with findAll():");
@@ -52,5 +55,12 @@ public class SpringBootEshopApplication {
              */
             logger.info("");
         };
+    }
+
+    private void saveUserIfNotExists(UserRepository repository, User user) {
+        repository.findByUsername(user.getUsername()).ifPresentOrElse(
+                existingUser -> logger.info("User with username " + user.getUsername() + " already exists."),
+                () -> repository.save(user)
+        );
     }
 }
