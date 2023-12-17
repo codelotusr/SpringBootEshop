@@ -19,8 +19,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().hasAuthority("ROLE_ADMIN")
                 )
+
                 .httpBasic(httpBasic -> {});
 
         return http.build();

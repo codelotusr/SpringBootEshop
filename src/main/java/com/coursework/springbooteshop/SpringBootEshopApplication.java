@@ -26,10 +26,10 @@ public class SpringBootEshopApplication {
     @Bean
     public CommandLineRunner demo(UserRepository repository) {
         return (args) -> {
-            saveUserIfNotExists(repository, new Customer("a", "a", LocalDate.of(2002, 9, 15), "Testinis", "Customer", "Test g. 15", "5555555555555555"));
-            saveUserIfNotExists(repository, new Customer("a1", "a1", LocalDate.of(2003, 9, 12), "Testinis1", "Customer1", "Test g. 5", "4555555555555555"));
-            saveUserIfNotExists(repository, new Manager("mg", "mg", LocalDate.of(2000, 10, 11), "Testinis2", "Manager", "EMP12345", "Certified", LocalDate.of(2020, 10, 11), true));
-            saveUserIfNotExists(repository, new Manager("mg1", "mg1", LocalDate.of(2001, 10, 11), "Testinis3", "Manager1", "EMP12346", "Certified", LocalDate.of(2020, 5, 11), false));
+            saveUserIfNotExists(repository, new Customer("aaa", "password", LocalDate.of(2002, 9, 15), "Testinis", "Customer", "Test g. 15", "5555555555555555", "CUSTOMER"));
+            saveUserIfNotExists(repository, new Customer("aaa1", "password", LocalDate.of(2003, 9, 12), "Testinis1", "Customer1", "Test g. 5", "4555555555555555", "CUSTOMER"));
+            saveUserIfNotExists(repository, new Manager("man1", "password", LocalDate.of(2000, 10, 11), "Testinis2", "Manager", "EMP12345", "Certified", LocalDate.of(2020, 10, 11), "ADMIN"));
+            saveUserIfNotExists(repository, new Manager("man2", "password", LocalDate.of(2001, 10, 11), "Testinis3", "Manager1", "EMP12346", "Certified", LocalDate.of(2020, 5, 11), "MANAGER"));
 
 
             logger.info("All users found with findAll():");

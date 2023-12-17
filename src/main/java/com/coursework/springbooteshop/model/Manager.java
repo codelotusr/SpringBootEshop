@@ -21,17 +21,14 @@ public class Manager extends User {
     private String employeeId;
     @NotBlank(message = "Medical certification is required")
     private String medicalCertification;
-    @NotBlank(message = "Employment date is required")
     private LocalDate employmentDate;
-    private boolean isAdministrator;
     @ManyToMany
     private List<Warehouse> worksAtWarehouse;
-    public Manager(String username, String password, LocalDate birthDate, String firstName, String lastName, String employeeId, String medicalCertification, LocalDate employmentDate, boolean isAdministrator) {
-        super(username, password, birthDate, firstName, lastName);
+    public Manager(String username, String password, LocalDate birthDate, String firstName, String lastName, String employeeId, String medicalCertification, LocalDate employmentDate, String role) {
+        super(username, password, birthDate, firstName, lastName, role);
         this.employeeId = employeeId;
         this.medicalCertification = medicalCertification;
         this.employmentDate = employmentDate;
-        this.isAdministrator = isAdministrator;
     }
 
 }

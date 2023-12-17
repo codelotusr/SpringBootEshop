@@ -24,8 +24,8 @@ public class Customer extends User {
     private String cardNo;
 
 
-    public Customer(String login, String password, LocalDate birthDate, String name, String surname, String address, String cardNo) {
-        super(login, password, birthDate, name, surname);
+    public Customer(String login, String password, LocalDate birthDate, String name, String surname, String address, String cardNo, String role) {
+        super(login, password, birthDate, name, surname, role);
         this.address = address;
         this.cardNo = cardNo;
     }

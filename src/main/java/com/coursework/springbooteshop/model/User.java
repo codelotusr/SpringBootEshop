@@ -32,22 +32,24 @@ public abstract class User implements Serializable {
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters")
     String password;
-    @NotNull(message = "Birth date is required")
     LocalDate birthDate;
     @NotNull(message = "First name is required")
     String firstName;
     @NotNull(message = "Last name is required")
     String lastName;
+    @NotNull(message = "Role is required")
+    String role;
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
     List<Cart> myCarts;
 
-    public User(String login, String password, LocalDate birthDate, String name, String surname) {
+    public User(String login, String password, LocalDate birthDate, String name, String surname, String role) {
         this.username = login;
         this.password = password;
         this.birthDate = birthDate;
         this.firstName = name;
         this.lastName = surname;
+        this.role = role;
     }
 
     public User(int id, String login, String password, LocalDate birthDate) {
