@@ -1,11 +1,9 @@
 package com.coursework.springbooteshop.controllers;
 
 import com.coursework.springbooteshop.errors.ProductNotFound;
-import com.coursework.springbooteshop.model.CentralProcessingUnit;
-import com.coursework.springbooteshop.model.GraphicsCard;
-import com.coursework.springbooteshop.model.Motherboard;
-import com.coursework.springbooteshop.model.Product;
+import com.coursework.springbooteshop.model.*;
 import com.coursework.springbooteshop.repos.ProductRepository;
+import com.coursework.springbooteshop.repos.WarehouseRepository;
 import com.coursework.springbooteshop.serializers.LocalDateAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,6 +20,8 @@ import java.time.LocalDate;
 public class ProductRest {
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private WarehouseRepository warehouseRepository;
 
     @PostMapping(value = "addProductCustom")
     public ResponseEntity<?> addProductCustom(@RequestBody String productInfo) {
@@ -128,17 +128,22 @@ public class ProductRest {
 
     @DeleteMapping(value = "deleteProduct/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable(name = "id") int id) {
-        boolean existsBeforeDelete = productRepository.existsById(id);
-        if (existsBeforeDelete) {
-            productRepository.deleteById(id);
-            boolean existsAfterDelete = productRepository.existsById(id);
-            if (!existsAfterDelete) {
-                return new ResponseEntity<>("Product with id = " + id + " was successfully deleted", HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Failed to delete the product with id = " + id, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFound(id));
+
+        Warehouse warehouse = product.getWarehouse();
+        if (warehouse != null) {
+            warehouse.getInStockProducts().remove(product);
+            warehouseRepository.save(warehouse);
+        }
+
+        productRepository.deleteById(id);
+
+        boolean existsAfterDelete = productRepository.existsById(id);
+        if (!existsAfterDelete) {
+            return new ResponseEntity<>("Product with id = " + id + " was successfully deleted", HttpStatus.OK);
         } else {
-            throw new ProductNotFound(id);
+            return new ResponseEntity<>("Failed to delete the product with id = " + id, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
