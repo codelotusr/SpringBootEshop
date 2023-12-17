@@ -2,6 +2,7 @@ package com.coursework.springbooteshop.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,9 +17,11 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 public class Manager extends User {
-
+    @NotBlank(message = "Employee ID is required")
     private String employeeId;
+    @NotBlank(message = "Medical certification is required")
     private String medicalCertification;
+    @NotBlank(message = "Employment date is required")
     private LocalDate employmentDate;
     private boolean isAdministrator;
     @ManyToMany
