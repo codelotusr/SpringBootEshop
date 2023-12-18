@@ -2,6 +2,8 @@ package com.coursework.springbooteshop.controllers;
 
 import com.coursework.springbooteshop.errors.ProductNotFound;
 import com.coursework.springbooteshop.model.*;
+import com.coursework.springbooteshop.repos.CartRepository;
+import com.coursework.springbooteshop.repos.CommentRepository;
 import com.coursework.springbooteshop.repos.ProductRepository;
 import com.coursework.springbooteshop.repos.WarehouseRepository;
 import com.coursework.springbooteshop.serializers.LocalDateAdapter;
@@ -22,6 +24,10 @@ public class ProductRest {
     private ProductRepository productRepository;
     @Autowired
     private WarehouseRepository warehouseRepository;
+    @Autowired
+    private CartRepository cartRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
     @PostMapping(value = "addProductCustom")
     public ResponseEntity<?> addProductCustom(@RequestBody String productInfo) {
@@ -131,6 +137,14 @@ public class ProductRest {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFound(id));
 
+        if (product.getCart() != null) {
+            Cart cart = product.getCart();
+            cart.getItemsInCart().remove(product);
+            cartRepository.save(cart);
+        }
+
+        commentRepository.deleteAll(product.getReviews());
+
         Warehouse warehouse = product.getWarehouse();
         if (warehouse != null) {
             warehouse.getInStockProducts().remove(product);
@@ -146,6 +160,7 @@ public class ProductRest {
             return new ResponseEntity<>("Failed to delete the product with id = " + id, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
 }
