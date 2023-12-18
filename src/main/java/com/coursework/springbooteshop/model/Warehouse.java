@@ -1,5 +1,6 @@
 package com.coursework.springbooteshop.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,6 +30,7 @@ public class Warehouse implements Serializable {
     private List<Manager> managers;
     @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonManagedReference
     private List<Product> inStockProducts;
 
     public Warehouse(String title, String address) {

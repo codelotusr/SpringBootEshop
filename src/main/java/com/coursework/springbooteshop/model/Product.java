@@ -28,7 +28,7 @@ public class Product implements Serializable {
     String manufacturer;
 
     @ManyToOne
-    @JsonIgnore
+    @JsonBackReference
     Warehouse warehouse;
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @LazyCollection(LazyCollectionOption.FALSE)
