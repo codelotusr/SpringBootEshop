@@ -90,6 +90,14 @@ public class UserRest {
                 WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserRest.class).getAllUsers()).withRel("Users"));
     }
 
+    @GetMapping(value = "getUserByUsername/{username}")
+    public EntityModel<User> getUserByUsername(@PathVariable(name = "username") String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFound(username));
+        return EntityModel.of(user,
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserRest.class).getUserByUsername(username)).withSelfRel(),
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserRest.class).getAllUsers()).withRel("Users"));
+    }
+
     @PutMapping(value = "updateUser/{id}")
     public ResponseEntity<?> updateUser(@PathVariable int id, @RequestBody String userDetailsJson) {
         Gson gson = new GsonBuilder()
