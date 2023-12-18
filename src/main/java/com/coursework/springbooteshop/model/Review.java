@@ -1,5 +1,7 @@
 package com.coursework.springbooteshop.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,7 @@ import lombok.Setter;
 public class Review extends Comment {
     private double rating;
     @ManyToOne
+    @JsonBackReference
     private Product product;
 
     public Review(String commentTitle, String commentBody, double rating, Product product) {
