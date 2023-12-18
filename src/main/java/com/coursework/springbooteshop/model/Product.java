@@ -1,5 +1,6 @@
 package com.coursework.springbooteshop.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,7 @@ public class Product implements Serializable {
     List<Review> reviews;
 
     @ManyToOne
+    @JsonBackReference
     Cart cart;
 
     public Product(String title, String description) {

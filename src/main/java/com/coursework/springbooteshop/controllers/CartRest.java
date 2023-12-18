@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @RestController
 public class CartRest {
     @Autowired
@@ -64,43 +65,51 @@ public class CartRest {
     @Transactional
     public ResponseEntity<Cart> updateCart(@PathVariable int id, @RequestBody Cart cartDetails) {
         Cart existingCart = cartRepository.findById(id)
-                .orElseThrow(() -> new CartNotFound(id)); // Implement CartNotFoundException
+                .orElseThrow(() -> new CartNotFound(id));
 
-        // Update the owner of the cart
-        if (cartDetails.getOwner() != null) {
-            User user = userRepository.findById(cartDetails.getOwner().getId())
-                    .orElseThrow(() -> new UserNotFound(cartDetails.getOwner().getId())); // Implement UserNotFoundException
-            existingCart.setOwner(user);
+        if (cartDetails.getOwner() != null && (existingCart.getOwner() == null || cartDetails.getOwner().getId() != existingCart.getOwner().getId())) {
+            User newOwner = userRepository.findById(cartDetails.getOwner().getId())
+                    .orElseThrow(() -> new UserNotFound(cartDetails.getOwner().getId()));
+            existingCart.setOwner(newOwner);
         }
 
-        // Update the products in the cart
         if (cartDetails.getItemsInCart() != null) {
-            // Clear the existing collection instead of replacing it
+            existingCart.getItemsInCart().forEach(product -> product.setCart(null));
             existingCart.getItemsInCart().clear();
 
-            // Add all the new products to the existing collection
             for (Product productDto : cartDetails.getItemsInCart()) {
                 Product product = productRepository.findById(productDto.getId())
-                        .orElseThrow(() -> new ProductNotFound(productDto.getId())); // Implement ProductNotFoundException
-                product.setCart(existingCart); // Link the product to the cart
+                        .orElseThrow(() -> new ProductNotFound(productDto.getId()));
+                product.setCart(existingCart);
                 existingCart.getItemsInCart().add(product);
             }
         }
 
-        Cart updatedCart = cartRepository.save(existingCart);
+        Cart updatedCart = cartRepository.saveAndFlush(existingCart);
         return new ResponseEntity<>(updatedCart, HttpStatus.OK);
     }
 
 
-
-
     @DeleteMapping("/deleteCart/{id}")
+    @Transactional
     public ResponseEntity<String> deleteCart(@PathVariable int id) {
         Cart cart = cartRepository.findById(id)
                 .orElseThrow(() -> new CartNotFound(id));
 
+        for (Product product : cart.getItemsInCart()) {
+            product.setCart(null);
+            productRepository.save(product);
+        }
+
+        cart.getItemsInCart().clear();
+
+        cart.getOwner().getMyCarts().remove(cart);
+
         cartRepository.delete(cart);
+
         return new ResponseEntity<>("Cart with id = " + id + " was successfully deleted", HttpStatus.OK);
     }
+
+
 
 }

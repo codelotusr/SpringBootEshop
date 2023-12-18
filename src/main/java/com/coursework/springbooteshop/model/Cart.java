@@ -1,6 +1,8 @@
 package com.coursework.springbooteshop.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,16 +25,27 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private LocalDate dateCreated;
-    @JsonIgnore
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Product> itemsInCart = new ArrayList<>();
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonManagedReference
+    private List<Product> itemsInCart;
     @ManyToOne
-    @JsonIgnore
+    @JsonBackReference
     private User owner;
 
     public Cart(User owner) {
         this.owner = owner;
         this.dateCreated = LocalDate.now();
         this.itemsInCart = new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        return "Cart{" +
+                "id=" + id +
+                ", dateCreated=" + dateCreated +
+                ", itemsInCart=" + itemsInCart +
+                ", owner=" + owner +
+                '}';
     }
 }
