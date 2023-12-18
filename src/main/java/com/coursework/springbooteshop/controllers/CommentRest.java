@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @RestController
 public class CommentRest {
@@ -106,8 +105,7 @@ public class CommentRest {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new CommentNotFound(id));
 
-        if (comment instanceof Review) {
-            Review review = (Review) comment;
+        if (comment instanceof Review review) {
             Product product = review.getProduct();
             if (product != null) {
                 product.getReviews().remove(review);

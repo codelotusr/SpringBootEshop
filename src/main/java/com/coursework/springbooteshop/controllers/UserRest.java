@@ -1,9 +1,9 @@
 package com.coursework.springbooteshop.controllers;
 
 import com.coursework.springbooteshop.errors.UserNotFound;
-import com.coursework.springbooteshop.model.Customer;
-import com.coursework.springbooteshop.model.Manager;
-import com.coursework.springbooteshop.model.User;
+import com.coursework.springbooteshop.model.*;
+import com.coursework.springbooteshop.repos.CartRepository;
+import com.coursework.springbooteshop.repos.ProductRepository;
 import com.coursework.springbooteshop.repos.UserRepository;
 import com.coursework.springbooteshop.serializers.LocalDateAdapter;
 import com.google.gson.Gson;
@@ -33,6 +33,10 @@ public class UserRest {
     private Validator validator;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private CartRepository cartRepository;
 
     @PostMapping(value = "addUserFull")
     public ResponseEntity<User> saveUser(@RequestBody User user) {
@@ -149,19 +153,27 @@ public class UserRest {
 
     @DeleteMapping(value = "deleteUser/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable(name = "id") int id) {
-        Optional<User> userOptional = userRepository.findById(id);
-        if (userOptional.isPresent()) {
-            userRepository.deleteById(id);
-            boolean existsAfterDelete = userRepository.existsById(id);
-            if (!existsAfterDelete) {
-                return new ResponseEntity<>("User with id = " + id + " was successfully deleted", HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Failed to delete the user with id = " + id, HttpStatus.INTERNAL_SERVER_ERROR);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFound(id));
+
+        for (Cart cart : user.getMyCarts()) {
+            for (Product product : cart.getItemsInCart()) {
+                product.setCart(null);
+                productRepository.save(product);
             }
+            cartRepository.delete(cart);
+        }
+
+        userRepository.deleteById(id);
+
+        boolean existsAfterDelete = userRepository.existsById(id);
+        if (!existsAfterDelete) {
+            return new ResponseEntity<>("User with id = " + id + " was successfully deleted", HttpStatus.OK);
         } else {
-            throw new UserNotFound(id);
+            return new ResponseEntity<>("Failed to delete the user with id = " + id, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
 }

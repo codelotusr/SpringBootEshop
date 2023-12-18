@@ -64,6 +64,7 @@ public class CartRest {
     @PutMapping("/updateCart/{id}")
     @Transactional
     public ResponseEntity<Cart> updateCart(@PathVariable int id, @RequestBody Cart cartDetails) {
+
         Cart existingCart = cartRepository.findById(id)
                 .orElseThrow(() -> new CartNotFound(id));
 
@@ -73,7 +74,7 @@ public class CartRest {
             existingCart.setOwner(newOwner);
         }
 
-        if (cartDetails.getItemsInCart() != null) {
+        if (cartDetails.getItemsInCart() != null && !cartDetails.getItemsInCart().isEmpty()) {
             existingCart.getItemsInCart().forEach(product -> product.setCart(null));
             existingCart.getItemsInCart().clear();
 
