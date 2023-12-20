@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -101,6 +102,33 @@ public class UserRest {
                 WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserRest.class).getUserByUsername(username)).withSelfRel(),
                 WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserRest.class).getAllUsers()).withRel("Users"));
     }
+
+    @PostMapping(value = "getUserByCredentials")
+    public ResponseEntity<?> getUserByCredentials(@RequestBody Map<String, String> credentials) {
+        String username = credentials.get("username");
+        String password = credentials.get("password");
+
+        if (username == null || password == null) {
+            return new ResponseEntity<>("Username and password are required", HttpStatus.BAD_REQUEST);
+        }
+
+        User user = userRepository.findByUsername(username).orElse(null);
+
+        if (user == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        boolean isPasswordMatch = passwordEncoder.matches(password, user.getPassword());
+
+        if (!isPasswordMatch) {
+            return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
+        }
+
+        user.setPassword(null);
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
 
     @PutMapping(value = "updateUser/{id}")
     public ResponseEntity<?> updateUser(@PathVariable int id, @RequestBody String userDetailsJson) {

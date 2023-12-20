@@ -18,14 +18,13 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/").permitAll()
-                        .anyRequest().hasAuthority("ROLE_ADMIN")
+                        .anyRequest().permitAll()
                 )
-
-                .httpBasic(httpBasic -> {});
+                .httpBasic(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
