@@ -118,11 +118,13 @@ public class UserRest {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
 
+
         boolean isPasswordMatch = passwordEncoder.matches(password, user.getPassword());
 
         if (!isPasswordMatch) {
             return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
         }
+
 
         user.setPassword(null);
 
